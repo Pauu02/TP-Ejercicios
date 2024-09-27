@@ -31,9 +31,9 @@ public class Polinomio {
         return Arrays.copyOf(polinomio, polinomio.length);
     }
         
-    def public String toString() {
-        return
-    }
+    //def public String toString() {
+    //   return
+    //}
         
     def public float valor(float v) {
         float cont = 0
