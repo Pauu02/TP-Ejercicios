@@ -1,109 +1,120 @@
 import java.util.Arrays;
 
 public class Polinomio {
-    // this.coeficientes = new int[] {0};
     private int[] polynomial;
 
-    public Polinomio() {
-        this.polynomial = new int[0];
+    public static void main(String[] args) {
+        Polinomio pol = new Polinomio();
+        Polinomio pol2 = new Polinomio(new int[]{1, 0, 1, 0, 2});
+        System.out.println(String.format("%s - %s", pol.toString(), pol2.toString()));
+        Polinomio polSuma = pol.resta(pol2);
+        System.out.println(polSuma.toString());
     }
 
+    public Polinomio() { this.polynomial = new int[]{0}; }
     public Polinomio(int[] coeficients) {
-
-        int lastNotZero = coeficients.length;
-        for (int i = 0; i < coeficients.length; i++) {
-            if (coeficients[i] != 0) {
-                lastNotZero = i;
+        
+        int lastNotZero = 1;
+        for (int i = coeficients.length - 1; i >= 0; i--) {
+            if (coeficients[i] != 0 || i == 0) {
+                lastNotZero = i + 1;
                 break;
             }
         }
-
-        this.polynomial = Arrays.copyOfRange(coeficients, lastNotZero, coeficients.length);
+ 
+        this.polynomial = Arrays.copyOfRange(coeficients, 0, lastNotZero);
     }
 
     public int grado() {
         return this.polynomial.length > 0 ? this.polynomial.length - 1 : this.polynomial.length;
     }
-
-    public int coeficiente(int i) {
-        if (i < 0 || i > this.polynomial.length - 1)
-            return 0;
-        i = this.polynomial.length - (i + 1);
-
-        return this.polynomial[i];
+    
+    public int coeficiente(int index) {
+        if (index < 0 || index > this.polynomial.length - 1) return 0;
+        
+        return this.polynomial[index];
     }
-
-    public void coeficiente(int index, int v) {
-        if (this.polynomial.length - 1 >= index) {
-            this.polynomial[index] = v;
+    
+    public void coeficiente(int index, int value) {
+        if (this.polynomial.length -1 >= index) {
+            this.polynomial[index] = value;
         } else {
-            this.polynomial = Arrays.copyOf(polynomial, index + 1);
-            this.polynomial[index] = v;
+            this.polynomial = Arrays.copyOf(polynomial, index+1);
+            this.polynomial[index] = value;
         }
-
-        int lastNotZero = this.polynomial.length;
-        for (int i = 0; i < this.polynomial.length; i++) {
-            if (this.polynomial[i] != 0) {
-                lastNotZero = i;
+        
+        int lastNotZero = 1;
+        for (int i = polynomial.length - 1; i >= 0; i--) {
+            if (polynomial[i] != 0 || i == 0) {
+                lastNotZero = i + 1;
                 break;
             }
         }
-
-        this.polynomial = Arrays.copyOfRange(this.polynomial, lastNotZero, this.polynomial.length);
+        
+        this.polynomial = Arrays.copyOfRange(this.polynomial, 0, lastNotZero);
     }
-
+    
     public int[] coeficientes() {
         return Arrays.copyOf(polynomial, polynomial.length);
     }
-
+    
     public Polinomio suma(Polinomio other) {
-        int gradoMax = Math.max(this.grado(), other.grado());
-        int[] nuevoCoefs = new int[gradoMax];
-
-        for (int i = 0; i <= gradoMax; i++) {
-            nuevoCoefs[i] = this.polynomial[i] + other.polynomial[i];
+        final int greatestLen = other.coeficientes().length > this.polynomial.length ? other.coeficientes().length : this.polynomial.length;
+        
+        final int[] thisPol = Arrays.copyOf(this.polynomial, greatestLen);
+        final int[] otherPol = Arrays.copyOf(other.coeficientes(), greatestLen);
+        
+        int[] sum = new int[greatestLen];
+        for (int i = 0; i < greatestLen; i++) {
+            sum[i] = thisPol[i] + otherPol[i];
         }
-
-        return new Polinomio(nuevoCoefs);
+        
+        return new Polinomio(sum);
     }
-
+    
     public Polinomio resta(Polinomio other) {
-        int gradoMax = Math.max(this.grado(), other.grado());
-        int[] nuevoCoefs = new int[gradoMax];
-
-        for (int i = 0; i <= gradoMax; i++) {
-            nuevoCoefs[i] = this.polynomial[i] - other.polynomial[i];
+        final int greatestLen = other.coeficientes().length > this.polynomial.length ? other.coeficientes().length : this.polynomial.length;
+        
+        final int[] thisPol = Arrays.copyOf(this.polynomial, greatestLen);
+        final int[] otherPol = Arrays.copyOf(other.coeficientes(), greatestLen);
+        
+        System.out.println(Arrays.toString(thisPol));
+        System.out.println(Arrays.toString(otherPol));
+        int[] sub = new int[greatestLen];
+        for (int i = 0; i < greatestLen; i++) {
+            sub[i] = thisPol[i] - otherPol[i];
         }
-
-        return new Polinomio(nuevoCoefs);
+        System.out.println(Arrays.toString(sub));
+        
+        return new Polinomio(sub);
     }
-
-    public float valor(float v) {
+    
+    public float valor(float value) {
         float result = 0;
-        for (int i = 0; i < polynomial.length; i++) {
-            result += polynomial[i] * Math.pow(v, i);
+        for (int i = this.polynomial.length - 1; i >= 0 ; i--) {
+            result += this.polynomial[i] * Math.pow(value, i);
         }
         return result;
     }
-
+    
     @Override
     public String toString() {
         String result = "";
-
-        for (int i = 0; i < this.polynomial.length; i++) {
+        
+        for (int i = this.polynomial.length - 1; i >= 0; i--) {
             final int value = this.polynomial[i];
-            if (value != 0 && i < this.polynomial.length - 2) {
-                result += value > 0 && i != 0 ? "+" : "";
-                result += value != 1 ? String.format("%dx^%d", value, this.polynomial.length - (i + 1))
-                        : String.format("x^%d", this.polynomial.length - 1 - i);
-            } else if (value != 0 && i == this.polynomial.length - 2) {
-                result += value > 0 ? "+" : "";
-                result += value != 1 ? String.format("%dx", value) : "x";
-            } else if (i == this.polynomial.length - 1) {
-                result += result != "" && value > 0 ? String.format("+%d", value) : "";
+            if (value != 0 && i > 1) {
+                result += value > 0 ? !result.isEmpty() ? "+" : "" :  "-";
+                result += Math.abs(value) != 1 ? String.format("%dx^%d", Math.abs(value), i) : String.format("x^%d", i);
+            } else if (value != 0  && i == 1) {
+                result += value > 0 ? !result.isEmpty() ? "+" : "" :  "-";
+                result += Math.abs(value) != 1 ? String.format("%dx", Math.abs(value)) : "x";
+            } else if (i == 0) {
+                result += value > 0 && !result.isEmpty() ? "+" : "";
+                result += result.isEmpty() || value != 0 ? value : "";
             }
         }
-
+        
         return result;
     }
 }
